@@ -1,0 +1,17 @@
+# Render Blueprint — deploys the platform as a free Docker web service.
+# Render reads the Dockerfile in the repo root.
+services:
+  - type: web
+    name: nexus-agents
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    envVars:
+      - key: SECRET_KEY
+        generateValue: true          # Render generates a strong secret
+      - key: DATABASE_URL
+        sync: false                  # paste your Neon Postgres URL in the dashboard
+      - key: LLM_PROVIDER
+        value: auto
+      - key: ANTHROPIC_API_KEY
+        sync: false                  # optional: paste your key for real AI replies

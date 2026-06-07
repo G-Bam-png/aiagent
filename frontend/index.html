@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nexus Agents — ИИ-агенты для автоматизации Avito, Instagram, Telegram, YouTube, TikTok</title>
+  <meta name="description" content="Платформа для создания ИИ-агентов, которые сами общаются с клиентами и продают в Avito, Telegram, Instagram, на сайте и в других каналах. Без программирования." />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body>
+
+  <!-- NAV -->
+  <header class="nav">
+    <div class="container nav-inner">
+      <a href="/" class="logo"><span class="logo-mark">N</span> Nexus<span style="color:var(--brand)">Agents</span></a>
+      <nav class="nav-links">
+        <a href="#features">Возможности</a>
+        <a href="#agents">Агенты</a>
+        <a href="#integrations">Интеграции</a>
+        <a href="#how">Как работает</a>
+        <a href="#pricing">Тарифы</a>
+      </nav>
+      <div class="nav-cta">
+        <a href="/app.html" class="btn btn-ghost">Войти</a>
+        <a href="/app.html#register" class="btn btn-primary">Начать бесплатно</a>
+      </div>
+      <button class="burger" onclick="document.querySelector('.nav-links').style.display='flex'">☰</button>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero-grid">
+      <div>
+        <span class="badge">⚡ ИИ-агенты на базе GPT и Claude</span>
+        <h1>ИИ-агенты, которые <span class="grad">общаются и продают</span> за вас</h1>
+        <p class="lead">Создайте умного агента за 10 минут и подключите к Avito, Telegram, Instagram, YouTube, TikTok и сайту. Он отвечает за 5 секунд, ведёт к заказу и передаёт горячих клиентов менеджеру.</p>
+        <div class="hero-actions">
+          <a href="/app.html#register" class="btn btn-primary btn-lg">Создать агента бесплатно →</a>
+          <a href="#agents" class="btn btn-ghost btn-lg">Смотреть примеры</a>
+        </div>
+        <div class="hero-trust">
+          <span>✅ <b>Без кода</b></span>
+          <span>🔌 <b>8+ каналов</b></span>
+          <span>🕒 <b>Запуск за 10 минут</b></span>
+          <span>🎁 <b>Демо без карты</b></span>
+        </div>
+      </div>
+      <div class="mock">
+        <div class="mock-head">
+          <div class="mock-ava">💼</div>
+          <div><b>Алиса — отдел продаж</b><small>онлайн · отвечает мгновенно</small></div>
+        </div>
+        <div class="mock-body">
+          <div class="bubble in" style="animation-delay:.1s">Здравствуйте! Есть ноутбук для работы до 80 тысяч?</div>
+          <div class="bubble out" style="animation-delay:.5s">Да! Lumix Air 14 — 79 990 ₽, 16 ГБ RAM, 512 ГБ SSD. В наличии 🚀 Для каких задач берёте?</div>
+          <div class="bubble in" style="animation-delay:1s">Для дизайна. Доставите в Казань?</div>
+          <div class="bubble out" style="animation-delay:1.5s">Отлично подойдёт. СДЭК в Казань 1–3 дня, при заказе сегодня — бесплатно. Оформляем? 💳</div>
+          <div class="typing" style="margin-top:4px"><span></span><span></span><span></span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTEGRATIONS STRIP -->
+  <div class="strip" id="integrations">
+    <div class="container">
+      <p>Один агент — все каналы общения с клиентами</p>
+      <div class="strip-row" id="strip-row">
+        <span class="chip"><span class="ic">🟢</span> Avito</span>
+        <span class="chip"><span class="ic">✈️</span> Telegram</span>
+        <span class="chip"><span class="ic">📸</span> Instagram</span>
+        <span class="chip"><span class="ic">💬</span> WhatsApp</span>
+        <span class="chip"><span class="ic">🅥</span> ВКонтакте</span>
+        <span class="chip"><span class="ic">▶️</span> YouTube</span>
+        <span class="chip"><span class="ic">🎵</span> TikTok</span>
+        <span class="chip"><span class="ic">🌐</span> Сайт</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEATURES -->
+  <section id="features">
+    <div class="container">
+      <div class="sec-head">
+        <span class="kicker">Возможности</span>
+        <h2>Всё, чтобы агент работал как лучший сотрудник</h2>
+        <p>Настройте поведение, обучите на своих данных и подключите к каналам — без разработчиков.</p>
+      </div>
+      <div class="grid-3">
+        <div class="card"><div class="ic-box">💬</div><h3>Автоматизация общения</h3><p>Закрывает до 70% обращений сам, отвечает за ~5 секунд и работает 24/7 без выходных.</p></div>
+        <div class="card"><div class="ic-box">📚</div><h3>База знаний</h3><p>Обучите агента на прайсах, документах и FAQ. Он отвечает только фактами, без выдумок.</p></div>
+        <div class="card"><div class="ic-box">🔌</div><h3>Мультиканальность</h3><p>Avito, Telegram, Instagram, WhatsApp, ВК, YouTube, TikTok и виджет на сайт — из одного места.</p></div>
+        <div class="card"><div class="ic-box">🤝</div><h3>Передача оператору</h3><p>Сложные и горячие запросы агент сам эскалирует человеку с полным контекстом диалога.</p></div>
+        <div class="card"><div class="ic-box">🧠</div><h3>GPT и Claude</h3><p>Под капотом — топовые модели. Выбирайте провайдера и тон общения под свой бренд.</p></div>
+        <div class="card"><div class="ic-box">🎛️</div><h3>No-code конструктор</h3><p>Готовые шаблоны под отрасли, визуальная настройка роли, тона и сценариев.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- AGENTS GALLERY -->
+  <section id="agents" class="agents-wrap">
+    <div class="container">
+      <div class="sec-head">
+        <span class="kicker">Готовые агенты</span>
+        <h2>Запустите за минуты — или соберите своего</h2>
+        <p>Выберите шаблон под задачу: продажи, поддержка, запись, отрасли. Всё настраивается.</p>
+      </div>
+      <div class="cat-filter" id="cat-filter"></div>
+      <div class="grid-agents" id="agents-grid">
+        <div class="agent-card"><span class="emoji">⏳</span><p>Загружаем галерею агентов…</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how">
+    <div class="container">
+      <div class="sec-head">
+        <span class="kicker">Как это работает</span>
+        <h2>Три шага до работающего агента</h2>
+      </div>
+      <div class="steps">
+        <div class="step"><div class="num">1</div><h3>Создайте агента</h3><p>Выберите шаблон, задайте имя, роль и тон общения. Или начните с чистого листа.</p></div>
+        <div class="step"><div class="num">2</div><h3>Обучите на данных</h3><p>Загрузите прайсы, услуги и FAQ в базу знаний. Проверьте ответы в плейграунде.</p></div>
+        <div class="step"><div class="num">3</div><h3>Подключите каналы</h3><p>Включите Avito, Telegram, Instagram или виджет на сайт — и агент в деле.</p></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS -->
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="stats-band">
+        <div class="grid-4">
+          <div class="stat"><div class="big">+40%</div><p>рост конверсии в продажу</p></div>
+          <div class="stat"><div class="big">70%</div><p>обращений без сотрудника</p></div>
+          <div class="stat"><div class="big">−60%</div><p>потерянных лидов</p></div>
+          <div class="stat"><div class="big">24/7</div><p>ответы без выходных</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" style="background:var(--bg-soft)">
+    <div class="container">
+      <div class="sec-head">
+        <span class="kicker">Тарифы</span>
+        <h2>Простые и прозрачные цены</h2>
+        <p>Начните бесплатно. Платите только когда агент приносит результат.</p>
+      </div>
+      <div class="pricing-grid">
+        <div class="price">
+          <h3>Старт</h3>
+          <div class="amount">0 ₽<span>/мес</span></div>
+          <p style="color:var(--muted)">Чтобы попробовать и запустить первого агента.</p>
+          <ul><li>1 ИИ-агент</li><li>Виджет на сайт</li><li>100 диалогов/мес</li><li>База знаний</li></ul>
+          <a href="/app.html#register" class="btn btn-ghost">Начать бесплатно</a>
+        </div>
+        <div class="price featured">
+          <span class="tag">Популярный</span>
+          <h3>Бизнес</h3>
+          <div class="amount">2 990 ₽<span>/мес</span></div>
+          <p style="color:var(--muted)">Для активных продаж в нескольких каналах.</p>
+          <ul><li>10 агентов</li><li>Все каналы: Avito, TG, IG…</li><li>10 000 диалогов/мес</li><li>Передача оператору</li><li>Аналитика и диалоги</li></ul>
+          <a href="/app.html#register" class="btn btn-primary">Выбрать Бизнес</a>
+        </div>
+        <div class="price">
+          <h3>Корпоративный</h3>
+          <div class="amount">от 9 900 ₽<span>/мес</span></div>
+          <p style="color:var(--muted)">Безлимит, интеграции и поддержка.</p>
+          <ul><li>Безлимит агентов</li><li>CRM: Bitrix24, amoCRM</li><li>Свой LLM-провайдер</li><li>SLA и приоритет</li></ul>
+          <a href="/app.html#register" class="btn btn-ghost">Обсудить внедрение</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA -->
+  <section style="padding-top:0">
+    <div class="container">
+      <div class="cta-band">
+        <h2>Запустите ИИ-агента уже сегодня</h2>
+        <p>Демо-аккаунт доступен сразу — без карты и установки.</p>
+        <a href="/app.html#register" class="btn btn-light btn-lg">Создать агента бесплатно →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <a href="/" class="logo"><span class="logo-mark">N</span> NexusAgents</a>
+          <p>Платформа для создания ИИ-агентов, которые автоматизируют общение и продажи в любых каналах.</p>
+        </div>
+        <div><h5>Продукт</h5><a href="#features">Возможности</a><a href="#agents">Агенты</a><a href="#pricing">Тарифы</a><a href="/app.html">Личный кабинет</a></div>
+        <div><h5>Каналы</h5><a href="#integrations">Avito</a><a href="#integrations">Telegram</a><a href="#integrations">Instagram</a><a href="#integrations">YouTube / TikTok</a></div>
+        <div><h5>Компания</h5><a href="#">О нас</a><a href="#">Документация</a><a href="#">Контакты</a><a href="#">Политика</a></div>
+      </div>
+      <div class="footer-bottom">
+        <span>© 2026 Nexus Agents. Демо-проект.</span>
+        <span>Сделано как платформа автоматизации ИИ-агентов</span>
+      </div>
+    </div>
+  </footer>
+
+  <script src="/js/landing.js"></script>
+</body>
+</html>

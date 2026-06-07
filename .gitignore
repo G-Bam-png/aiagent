@@ -1,0 +1,7 @@
+backend/.venv/
+**/__pycache__/
+*.pyc
+*.db
+.env
+backend/scripts/*_out.txt
+node_modules/
