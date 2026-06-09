@@ -33,13 +33,11 @@ async def generate(
     resolved = settings.resolved_provider if provider in ("", "auto") else provider
     max_tokens = max_tokens or settings.llm_max_tokens
 
-    # Priority chain: preferred provider → free keyless → demo (always works).
-    chain: list[str] = {
-        "anthropic": ["anthropic", "free", "demo"],
-        "openai": ["openai", "free", "demo"],
-        "free": ["free", "demo"],
-        "demo": ["demo"],
-    }.get(resolved, ["free", "demo"])
+    # Try the preferred provider first, then every other one in priority order.
+    # So a newly-added OpenAI/Gemini key is used even if a dead Anthropic key is
+    # still set (anthropic fails → openai → free → demo). demo never fails.
+    priority = ["anthropic", "openai", "free", "demo"]
+    chain = [resolved] + [p for p in priority if p != resolved]
 
     for p in chain:
         try:
