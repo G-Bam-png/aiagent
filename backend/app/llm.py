@@ -79,7 +79,12 @@ async def _openai(system, messages, model, temperature, max_tokens) -> str:
     # Build the full URL explicitly — httpx drops the base_url path (e.g.
     # /v1beta/openai for Gemini) when the request path starts with "/".
     url = settings.openai_base_url.rstrip("/") + "/chat/completions"
-    headers = {"Authorization": f"Bearer {settings.openai_api_key}"}
+    headers = {
+        "Authorization": f"Bearer {settings.openai_api_key}",
+        # Used by OpenRouter for attribution; harmless/ignored by OpenAI & Gemini.
+        "HTTP-Referer": settings.openai_referer,
+        "X-Title": settings.openai_title,
+    }
     async with httpx.AsyncClient(timeout=60.0) as c:
         r = await c.post(url, json=payload, headers=headers)
         r.raise_for_status()

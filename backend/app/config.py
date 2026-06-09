@@ -20,8 +20,12 @@ class Settings(BaseSettings):
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-6"
     openai_api_key: str = ""
-    openai_base_url: str = "https://api.openai.com/v1"
-    openai_model: str = "gpt-4o-mini"
+    # Defaults point at OpenRouter's free tier. Override for real OpenAI
+    # (https://api.openai.com/v1, gpt-4o-mini) or Gemini/Groq.
+    openai_base_url: str = "https://openrouter.ai/api/v1"
+    openai_model: str = "meta-llama/llama-3.3-70b-instruct:free"
+    openai_referer: str = "https://nexus-agents.onrender.com"
+    openai_title: str = "Nexus Agents"
     llm_max_tokens: int = 600
 
     # Free keyless provider (Pollinations, OpenAI-compatible) — used when no paid
