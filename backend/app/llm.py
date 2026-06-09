@@ -85,10 +85,17 @@ async def _openai(system, messages, model, temperature, max_tokens) -> str:
         "HTTP-Referer": settings.openai_referer,
         "X-Title": settings.openai_title,
     }
+    last = "openai request failed"
     async with httpx.AsyncClient(timeout=60.0) as c:
-        r = await c.post(url, json=payload, headers=headers)
-        r.raise_for_status()
-        return r.json()["choices"][0]["message"]["content"].strip()
+        for attempt in range(3):
+            r = await c.post(url, json=payload, headers=headers)
+            if r.status_code == 200:
+                return r.json()["choices"][0]["message"]["content"].strip()
+            last = f"HTTP {r.status_code}: {r.text[:160]}"
+            if r.status_code not in (429, 500, 502, 503, 504):
+                break
+            await asyncio.sleep(2 * (attempt + 1))
+    raise RuntimeError(last)
 
 
 async def _free(system, messages, model, temperature, max_tokens) -> str:
