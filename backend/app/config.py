@@ -16,13 +16,19 @@ class Settings(BaseSettings):
     token_ttl_hours: int = 168
 
     # LLM
-    llm_provider: str = "auto"  # auto | anthropic | openai | demo
+    llm_provider: str = "auto"  # auto | anthropic | openai | free | demo
     anthropic_api_key: str = ""
     anthropic_model: str = "claude-sonnet-4-6"
     openai_api_key: str = ""
     openai_base_url: str = "https://api.openai.com/v1"
     openai_model: str = "gpt-4o-mini"
     llm_max_tokens: int = 600
+
+    # Free keyless provider (Pollinations, OpenAI-compatible) — used when no paid
+    # key is configured, and as automatic fallback when a paid provider errors.
+    free_base_url: str = "https://text.pollinations.ai/openai"
+    free_model: str = "openai"
+    free_referer: str = "nexus-agents"
 
     # Channels
     avito_api_base: str = "https://api.avito.ru"
@@ -37,7 +43,7 @@ class Settings(BaseSettings):
             return "anthropic"
         if self.openai_api_key:
             return "openai"
-        return "demo"
+        return "free"
 
 
 @lru_cache

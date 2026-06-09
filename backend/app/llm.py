@@ -1,13 +1,15 @@
-"""LLM abstraction with three interchangeable providers.
+"""LLM abstraction with interchangeable providers + automatic fallback chain.
 
-- anthropic : official SDK (Claude)
-- openai    : any OpenAI-compatible /chat/completions endpoint
-- demo      : deterministic offline responder (no API key needed)
+- anthropic : official SDK (Claude) — needs a key with credit
+- openai    : any OpenAI-compatible /chat/completions endpoint — needs a key
+- free      : keyless OpenAI-compatible endpoint (Pollinations) — no key, free
+- demo      : deterministic offline responder (last-resort, never fails)
 
-The provider is resolved per call: an agent may pin a provider, otherwise the
-platform default (settings.resolved_provider) is used.
+`generate()` tries the preferred provider, then falls through to `free`, then
+`demo`, so a conversation always gets the best available answer and never crashes.
 """
 
+import asyncio
 import logging
 
 import httpx
@@ -31,13 +33,26 @@ async def generate(
     resolved = settings.resolved_provider if provider in ("", "auto") else provider
     max_tokens = max_tokens or settings.llm_max_tokens
 
-    try:
-        if resolved == "anthropic" and settings.anthropic_api_key:
-            return await _anthropic(system, messages, model, temperature, max_tokens)
-        if resolved == "openai" and settings.openai_api_key:
-            return await _openai(system, messages, model, temperature, max_tokens)
-    except Exception:  # noqa: BLE001 — never crash a conversation on provider error
-        log.exception("LLM provider '%s' failed — falling back to demo", resolved)
+    # Priority chain: preferred provider → free keyless → demo (always works).
+    chain: list[str] = {
+        "anthropic": ["anthropic", "free", "demo"],
+        "openai": ["openai", "free", "demo"],
+        "free": ["free", "demo"],
+        "demo": ["demo"],
+    }.get(resolved, ["free", "demo"])
+
+    for p in chain:
+        try:
+            if p == "anthropic" and settings.anthropic_api_key:
+                return await _anthropic(system, messages, model, temperature, max_tokens)
+            if p == "openai" and settings.openai_api_key:
+                return await _openai(system, messages, model, temperature, max_tokens)
+            if p == "free":
+                return await _free(system, messages, model, temperature, max_tokens)
+            if p == "demo":
+                return _demo(system, messages)
+        except Exception as e:  # noqa: BLE001 — try the next provider in the chain
+            log.warning("LLM provider '%s' failed (%s) — trying next", p, e)
 
     return _demo(system, messages)
 
@@ -68,6 +83,33 @@ async def _openai(system, messages, model, temperature, max_tokens) -> str:
         r = await c.post("/chat/completions", json=payload, headers=headers)
         r.raise_for_status()
         return r.json()["choices"][0]["message"]["content"].strip()
+
+
+async def _free(system, messages, model, temperature, max_tokens) -> str:
+    """Keyless OpenAI-compatible endpoint (Pollinations). Retries transient
+    rate-limit / network errors with backoff."""
+    payload = {
+        "model": model or settings.free_model,
+        "messages": [{"role": "system", "content": system}, *messages],
+        "max_tokens": max_tokens,
+        "temperature": temperature,
+        "seed": 1,
+    }
+    headers = {"Referer": settings.free_referer, "Content-Type": "application/json"}
+    last = "free provider failed"
+    async with httpx.AsyncClient(timeout=60.0) as c:
+        for attempt in range(4):
+            try:
+                r = await c.post(settings.free_base_url, json=payload, headers=headers)
+                if r.status_code == 200:
+                    return r.json()["choices"][0]["message"]["content"].strip()
+                last = f"HTTP {r.status_code}: {r.text[:120]}"
+                if r.status_code not in (429, 500, 502, 503, 504):
+                    break
+            except httpx.HTTPError as e:
+                last = f"{type(e).__name__}: {e}"
+            await asyncio.sleep(1.5 * (attempt + 1))
+    raise RuntimeError(last)
 
 
 def _demo(system: str, messages: list[Message]) -> str:
@@ -105,25 +147,34 @@ def _demo(system: str, messages: list[Message]) -> str:
 
 
 async def diagnostic() -> dict:
-    """Test the configured provider WITHOUT the demo fallback, surfacing the real
-    error. Used by the /api/diag/llm endpoint to debug why replies are demo-only."""
-    resolved = settings.resolved_provider
+    """Probe each available provider individually (no fallback masking) plus the
+    effective reply generate() would return. Used by /api/diag/llm."""
     info: dict = {
-        "resolved_provider": resolved,
+        "resolved_provider": settings.resolved_provider,
         "anthropic_key_set": bool(settings.anthropic_api_key),
         "anthropic_model": settings.anthropic_model,
         "openai_key_set": bool(settings.openai_api_key),
+        "free_model": settings.free_model,
+        "providers": {},
     }
     test_msgs = [{"role": "user", "content": "Ответь одним словом: OK"}]
-    try:
-        if resolved == "anthropic" and settings.anthropic_api_key:
-            info["reply"] = await _anthropic("Ты тест.", test_msgs, "", 0.0, 16)
-        elif resolved == "openai" and settings.openai_api_key:
-            info["reply"] = await _openai("Ты тест.", test_msgs, "", 0.0, 16)
-        else:
-            info["reply"] = _demo("", test_msgs)
-        info["ok"] = True
-    except Exception as e:  # noqa: BLE001
-        info["ok"] = False
-        info["error"] = f"{type(e).__name__}: {e}"
+
+    async def _probe(name: str, coro) -> None:
+        try:
+            txt = await coro
+            info["providers"][name] = {"ok": True, "reply": txt[:160]}
+        except Exception as e:  # noqa: BLE001
+            info["providers"][name] = {"ok": False, "error": f"{type(e).__name__}: {e}"}
+
+    if settings.anthropic_api_key:
+        await _probe("anthropic", _anthropic("Ты тест.", test_msgs, "", 0.0, 16))
+    if settings.openai_api_key:
+        await _probe("openai", _openai("Ты тест.", test_msgs, "", 0.0, 16))
+    await _probe("free", _free("Ты тест.", test_msgs, "", 0.3, 32))
+
+    info["effective_reply"] = await generate(
+        "Ты — менеджер по продажам. Отвечай по-русски.", test_msgs,
+        temperature=0.3, max_tokens=40,
+    )
+    info["ok"] = any(p.get("ok") for p in info["providers"].values())
     return info
