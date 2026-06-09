@@ -23,7 +23,15 @@ class Settings(BaseSettings):
     # Defaults point at OpenRouter's free tier. Override for real OpenAI
     # (https://api.openai.com/v1, gpt-4o-mini) or Gemini/Groq.
     openai_base_url: str = "https://openrouter.ai/api/v1"
-    openai_model: str = "meta-llama/llama-3.3-70b-instruct:free"
+    openai_model: str = "deepseek/deepseek-chat-v3-0324:free"
+    # Tried in order if the primary model is rate-limited (429) — free OpenRouter
+    # models saturate at different times, so cycling improves the odds of a reply.
+    openai_fallback_models: str = (
+        "meta-llama/llama-3.3-70b-instruct:free,"
+        "qwen/qwen-2.5-72b-instruct:free,"
+        "google/gemma-2-9b-it:free,"
+        "mistralai/mistral-7b-instruct:free"
+    )
     openai_referer: str = "https://nexus-agents.onrender.com"
     openai_title: str = "Nexus Agents"
     llm_max_tokens: int = 600

@@ -44,7 +44,7 @@ async def generate(
             if p == "anthropic" and settings.anthropic_api_key:
                 return await _anthropic(system, messages, model, temperature, max_tokens)
             if p == "openai" and settings.openai_api_key:
-                return await _openai(system, messages, model, temperature, max_tokens)
+                return await _openai_multi(system, messages, model, temperature, max_tokens)
             if p == "free":
                 return await _free(system, messages, model, temperature, max_tokens)
             if p == "demo":
@@ -53,6 +53,25 @@ async def generate(
             log.warning("LLM provider '%s' failed (%s) — trying next", p, e)
 
     return _demo(system, messages)
+
+
+async def _openai_multi(system, messages, model, temperature, max_tokens) -> str:
+    """Try the primary model, then each fallback, until one answers. Free
+    OpenRouter models rate-limit at different times, so cycling raises the hit
+    rate. Raises only if every model fails (→ caller falls back to free/demo)."""
+    primary = model or settings.openai_model
+    models = [primary]
+    for m in (x.strip() for x in settings.openai_fallback_models.split(",")):
+        if m and m not in models:
+            models.append(m)
+    last: Exception | None = None
+    for mdl in models:
+        try:
+            return await _openai(system, messages, mdl, temperature, max_tokens)
+        except Exception as e:  # noqa: BLE001 — try the next model
+            last = e
+            log.info("OpenRouter model '%s' failed: %s", mdl, e)
+    raise last or RuntimeError("no openai models available")
 
 
 async def _anthropic(system, messages, model, temperature, max_tokens) -> str:
@@ -182,7 +201,7 @@ async def diagnostic() -> dict:
     if settings.anthropic_api_key:
         await _probe("anthropic", _anthropic("Ты тест.", test_msgs, "", 0.0, 16))
     if settings.openai_api_key:
-        await _probe("openai", _openai("Ты тест.", test_msgs, "", 0.0, 16))
+        await _probe("openai", _openai_multi("Ты тест.", test_msgs, "", 0.0, 16))
     await _probe("free", _free("Ты тест.", test_msgs, "", 0.3, 32))
 
     info["effective_reply"] = await generate(
