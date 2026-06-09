@@ -102,3 +102,28 @@ def _demo(system: str, messages: list[Message]) -> str:
             "и я помогу подобрать лучшее решение."
         )
     return "Здравствуйте! Чем могу помочь?"
+
+
+async def diagnostic() -> dict:
+    """Test the configured provider WITHOUT the demo fallback, surfacing the real
+    error. Used by the /api/diag/llm endpoint to debug why replies are demo-only."""
+    resolved = settings.resolved_provider
+    info: dict = {
+        "resolved_provider": resolved,
+        "anthropic_key_set": bool(settings.anthropic_api_key),
+        "anthropic_model": settings.anthropic_model,
+        "openai_key_set": bool(settings.openai_api_key),
+    }
+    test_msgs = [{"role": "user", "content": "Ответь одним словом: OK"}]
+    try:
+        if resolved == "anthropic" and settings.anthropic_api_key:
+            info["reply"] = await _anthropic("Ты тест.", test_msgs, "", 0.0, 16)
+        elif resolved == "openai" and settings.openai_api_key:
+            info["reply"] = await _openai("Ты тест.", test_msgs, "", 0.0, 16)
+        else:
+            info["reply"] = _demo("", test_msgs)
+        info["ok"] = True
+    except Exception as e:  # noqa: BLE001
+        info["ok"] = False
+        info["error"] = f"{type(e).__name__}: {e}"
+    return info

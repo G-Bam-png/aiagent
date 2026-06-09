@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 
+from .. import llm
 from ..catalog import CHANNELS, TEMPLATES
 from ..config import settings
 from ..database import get_db
@@ -26,6 +27,13 @@ def provider():
     """Which LLM backend is active — surfaced in the UI so users know if they're
     in offline demo mode."""
     return {"provider": settings.resolved_provider}
+
+
+@router.get("/diag/llm")
+async def diag_llm(user: User = Depends(get_current_user)):
+    """Authenticated diagnostic: try a real LLM call and surface the exact error
+    (e.g. invalid ANTHROPIC_API_KEY) instead of silently falling back to demo."""
+    return await llm.diagnostic()
 
 
 @router.get("/stats")
